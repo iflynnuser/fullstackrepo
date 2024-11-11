@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .                # Корневая директория, где находится Dockerfile и весь проект
+    container_name: fastapi_app
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app          # Монтирует всю директорию проекта в контейнер
+    ports:
+      - "8000:8000"             # Пробрасывает порт 8000 для доступа к приложению
+    env_file:
+      - .env                    # Использует файл .env для переменных окружения
+    command: >
+      uvicorn app:app --host 0.0.0.0 --port 8000
+    depends_on:
+      - mongo                   # Зависимость от сервиса MongoDB
+
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"           # Пробрасывает порт 27017 для доступа к базе данных MongoDB
+    volumes:
+      - mongo_data:/data/db     # Хранит данные MongoDB в постоянном volume
+    environment:
+      - MONGO_INITDB_DATABASE=FullstackFastAPI
+
+volumes:
+  mongo_data:
